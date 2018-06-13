@@ -1,0 +1,110 @@
+<html>
+   <head>
+      <title>VueJs Introduction</title>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.4.4/css/bulma.min.css">
+      <link rel="shortcut icon" type="image/png" href="images/icons/favicon-16x16.png"/>
+      <script type = "text/javascript" src = "https://cdnjs.cloudflare.com/ajax/libs/vue/2.4.0/vue.js"></script>
+      <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+   </head>
+   <body>
+       <div id="intro" style = "text-align:center;">
+           <!-- Go back-->
+         <input type='button' @click='goBack()' value='Go back' class="m-l-200 m-t-20">
+            <br><br>
+         <h2>{{ message }}</h2>       
+      </div>
+       
+       
+       <!--<div id='myapp'>-->
+       <form id="app" @submit.prevent="submitForm" action="" method="post" class="box"
+             style="margin-left: 300px;width: 500px;">   
+           <div class="message" v-show="stmessage">
+               <h1>User added successfully</h1>
+           </div>
+                
+            <section class="form">
+             <div class="field">
+               <label class="label">Name</label>
+               <div class="control">
+                 <input v-model="name" class="input is-rounded" type="text" placeholder="Name">
+               </div>
+             </div>
+             <div class="field">
+               <label class="label">UserName</label>
+               <div class="control">
+                 <input v-model="username" class="input is-rounded" type="text" placeholder="User Name">
+               </div>
+             </div>
+             <div class="field">
+               <label class="label">Email</label>
+               <div class="control">
+                 <input v-model="email" class="input is-rounded" type="text" placeholder="Email">
+               </div>
+             </div>
+            <p>
+                <div class="box has-text-centered">
+                    <!--<input class="button is-primary" type="submit" value="Submit">-->
+                     <button @click="stmessage ^= true" type="submit" class="button is-primary" name="button">Submit</button>
+                </div>
+            </p>
+             </section>
+        </form>
+       <!--</div>-->
+       
+       <script type = "text/javascript">
+         var vue_det = new Vue({
+            el: '#intro',
+            data: {
+               message: 'Add New User'
+            },
+            methods:{
+                goBack: function(){
+                      location.href = 'index.html';
+                  }
+            }
+         });
+          
+        var app = new Vue({
+            el:'#app',
+            data() {
+                return {
+                    stmessage : false,
+                    username :'', // initialise this to an empty string
+                    name :'', // same thing
+                    email :'', // same thing
+                }
+            },
+            methods:{
+              submitForm:function(e) {
+                let self = this;
+                //for sending post request refer :https://stackoverflow.com/questions/48839798/axios-post-request-not-working-when-passed-object
+                axios.get('fetchUsers.php', {
+                  params: {
+                    username: this.username,
+                    name:this.name,
+                    email:this.email,
+                    action : "adduser"
+                  }
+               })
+               .then(function (response) {
+                  app.users = response.data;
+                  this.stmessage = true;
+                  //Hide the status message after 3 seconds
+                    setTimeout(function(){
+                            self.stmessage = false;
+                    }, 3000);
+               })
+               .catch(function (error) {
+                   console.log(error);
+//                   this.stmessage = false;
+               });
+                event.preventDefault();
+              }
+            }
+        })
+        
+        
+        </script>
+    </body>
+</html>
+              

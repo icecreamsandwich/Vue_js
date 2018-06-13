@@ -1,8 +1,8 @@
 <?php
 
-$host = "localhost"; /* Host name */
+$host = "192.168.1.150"; /* Host name */
 $user = "root"; /* User */
-$password = ""; /* Password */
+$password = "M0dc0mp!"; /* Password */
 $dbname = "vue_js_tutorial"; /* Database name */
 
 $con = mysqli_connect($host, $user, $password,$dbname);

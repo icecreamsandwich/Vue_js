@@ -1,8 +1,12 @@
 <html>
    <head>
       <title>VueJs Introduction</title>
+      <link rel="shortcut icon" type="image/png" href="images/icons/favicon-16x16.png"/>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.4.4/css/bulma.min.css">
       <script type = "text/javascript" src = "https://cdnjs.cloudflare.com/ajax/libs/vue/2.4.0/vue.js"></script>
+      <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script> 
       <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+      
    </head>
    <body>
       <div id = "intro" style = "text-align:center;">
@@ -14,12 +18,18 @@
         <!-- Select All records -->
         <input type='button' @click='allRecords()' value='Select All users'>
         <br><br>
-
-        <!-- Select record by ID -->
-        <input type='text' v-model='userid' placeholder="Enter Userid between 1 - 24">
-        <input type='button' @click='recordByID()' value='Select user by ID'>
+        
+         <!-- Add new user -->
+        <input type='button' @click='addUser()' value='Add new user'>
         <br><br>
 
+        <!-- Select record by ID -->
+        <div class="is-pulled-right is-clearfix">
+            <input type='text' v-model='userid' placeholder="Enter Userid between 1 - 24">
+            <input type='button' @click='recordByID()' value='Select user by ID'>
+        </div>
+        
+        <br><br>
         <!-- List records -->
         <table border='1' width='80%' style='border-collapse: collapse;'>
           <tr>
@@ -38,7 +48,7 @@
         </table>
  
 </div>
-
+       
       <script type = "text/javascript">
          var vue_det = new Vue({
             el: '#intro',
@@ -51,11 +61,16 @@
             el: '#myapp',
             data: {
               users: "",
-              userid: 0
+              userid: 1,
+              action : "fetch"
             },
             methods: {
               allRecords: function(){
-                axios.get('fetchUsers.php')
+                axios.get('fetchUsers.php',{
+                     params: {
+                       action : "fetch"
+                     }
+                  })
                 .then(function (response) {
                    app.users = response.data;
                 })
@@ -67,7 +82,8 @@
                 if(this.userid > 0){
                   axios.get('fetchUsers.php', {
                      params: {
-                       userid: this.userid
+                       userid: this.userid,
+                       action : "fetch"
                      }
                   })
                   .then(function (response) {
@@ -77,9 +93,12 @@
                      console.log(error);
                   });
                 }
+              },
+              addUser: function(){
+                  location.href = 'addUser.html';
               }
             }
-})
-      </script>
+        });
+      </script>      
    </body>
 </html>
