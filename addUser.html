@@ -1,44 +1,54 @@
 <html>
    <head>
-      <title>VueJs Introduction</title>
+      <title>VueJs Add User</title>
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.4.4/css/bulma.min.css">
       <link rel="shortcut icon" type="image/png" href="images/icons/favicon-16x16.png"/>
+       <script src="https://unpkg.com/vee-validate@2.1.0-beta.2/dist/vee-validate.js"></script>
       <script type = "text/javascript" src = "https://cdnjs.cloudflare.com/ajax/libs/vue/2.4.0/vue.js"></script>
       <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+     
    </head>
    <body>
        <div id="intro" style = "text-align:center;">
            <!-- Go back-->
-         <input type='button' @click='goBack()' value='Go back' class="m-l-200 m-t-20">
+         <input type='button' @click='goBack()' value='Go back' class="button is-success is-rounded">
             <br><br>
-         <h2>{{ message }}</h2>       
+         <h2 class="title">{{ message }}</h2>       
       </div>
        
        
        <!--<div id='myapp'>-->
-       <form id="app" @submit.prevent="submitForm" action="" method="post" class="box"
+       <form id="app" @submit.prevent="submitForm" action="" 
+             method="post" class="box"
              style="margin-left: 300px;width: 500px;">   
-           <div class="message" v-show="stmessage">
-               <h1>User added successfully</h1>
+           <div class="message">
+               <h1>{{ stmessage }}</h1>
+               <h1>{{ res }}</h1>
+               
            </div>
                 
             <section class="form">
              <div class="field">
                <label class="label">Name</label>
                <div class="control">
-                 <input v-model="name" class="input is-rounded" type="text" placeholder="Name">
-               </div>
+                 <input v-model="name" name="name"  v-validate="'required|length:10'" class="input is-rounded" type="text" 
+                        placeholder="Name" required>
+               </div>   
              </div>
              <div class="field">
                <label class="label">UserName</label>
                <div class="control">
-                 <input v-model="username" class="input is-rounded" type="text" placeholder="User Name">
+                 <input v-model="username" name="username" v-validate="'required|length:10'" class="input is-rounded" 
+                        type="text" placeholder="User Name" required>
                </div>
              </div>
              <div class="field">
                <label class="label">Email</label>
                <div class="control">
-                 <input v-model="email" class="input is-rounded" type="text" placeholder="Email">
+                   <input v-model="email" name="email" v-validate="'email'"
+                          class="input is-rounded"
+                        type="text" placeholder="Email" required>
+                  <span v-show="errors.has('email')" class="help is-danger">{{ errors.first('email') }}</span>
                </div>
              </div>
             <p>
@@ -63,15 +73,16 @@
                   }
             }
          });
-          
+        Vue.use(VeeValidate);  
         var app = new Vue({
             el:'#app',
             data() {
                 return {
-                    stmessage : false,
+                    stmessage : '',
                     username :'', // initialise this to an empty string
                     name :'', // same thing
                     email :'', // same thing
+                    res :'', // same thing
                 }
             },
             methods:{
@@ -88,10 +99,11 @@
                })
                .then(function (response) {
                   app.users = response.data;
-                  this.stmessage = true;
+                  if(response.data !== "")this.stmessage = response;
+                  this.res = response;
                   //Hide the status message after 3 seconds
                     setTimeout(function(){
-                            self.stmessage = false;
+                            self.stmessage = '';
                     }, 3000);
                })
                .catch(function (error) {

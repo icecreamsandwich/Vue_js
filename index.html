@@ -1,104 +1,149 @@
 <html>
-   <head>
-      <title>VueJs Introduction</title>
-      <link rel="shortcut icon" type="image/png" href="images/icons/favicon-16x16.png"/>
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.4.4/css/bulma.min.css">
-      <script type = "text/javascript" src = "https://cdnjs.cloudflare.com/ajax/libs/vue/2.4.0/vue.js"></script>
-      <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script> 
-      <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-      
-   </head>
-   <body>
-      <div id = "intro" style = "text-align:center;">
-         <h1>{{ message }}</h1>
-      </div>
-       
-<div id='myapp'>
- 
-        <!-- Select All records -->
-        <input type='button' @click='allRecords()' value='Select All users'>
-        <br><br>
-        
-         <!-- Add new user -->
-        <input type='button' @click='addUser()' value='Add new user'>
-        <br><br>
+    <head>
+        <title>VueJs Introduction</title>
+        <link rel="shortcut icon" type="image/png" href="images/icons/favicon-16x16.png"/>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.4.4/css/bulma.min.css">
+        <script type = "text/javascript" src = "https://cdnjs.cloudflare.com/ajax/libs/vue/2.4.0/vue.js"></script>
+        <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script> 
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+        <!--Include the vuejs-dialog plugin-->
+        <script type="text/javascript" src="https://unpkg.com/vuejs-dialog@0.4.7/dist/vuejs-dialog.min.js"></script>
 
-        <!-- Select record by ID -->
-        <div class="is-pulled-right is-clearfix">
-            <input type='text' v-model='userid' placeholder="Enter Userid between 1 - 24">
-            <input type='button' @click='recordByID()' value='Select user by ID'>
+    </head>
+    <body>
+        <div id = "intro" style = "text-align:center;">
+            <h1 class="title">{{ message }}</h1>
         </div>
-        
-        <br><br>
-        <!-- List records -->
-        <table border='1' width='80%' style='border-collapse: collapse;'>
-          <tr>
-            <th>UserId</th>
-            <th>Username</th>
-            <th>Name</th>
-            <th>Email</th>
-          </tr>
 
-          <tr v-for='user in users'>
-            <td>{{ user.id }}</td>
-            <td>{{ user.username }}</td>
-            <td>{{ user.name }}</td>
-            <td>{{ user.email }}</td>
-          </tr>
-        </table>
- 
-</div>
-       
-      <script type = "text/javascript">
-         var vue_det = new Vue({
-            el: '#intro',
-            data: {
-               message: 'My first VueJS Task'
-            }
-         });
-     //ajax fetching data with mysql sample    
-         var app = new Vue({
-            el: '#myapp',
-            data: {
-              users: "",
-              userid: 1,
-              action : "fetch"
-            },
-            methods: {
-              allRecords: function(){
-                axios.get('fetchUsers.php',{
-                     params: {
-                       action : "fetch"
-                     }
-                  })
-                .then(function (response) {
-                   app.users = response.data;
-                })
-                .catch(function (error) {
-                   console.log(error);
-                });
-              },
-              recordByID: function(){
-                if(this.userid > 0){
-                  axios.get('fetchUsers.php', {
-                     params: {
-                       userid: this.userid,
-                       action : "fetch"
-                     }
-                  })
-                  .then(function (response) {
-                     app.users = response.data;
-                  })
-                  .catch(function (error) {
-                     console.log(error);
-                  });
+        <div id='myapp'>
+            <div class="message">
+                <h1>{{ stmessage }}</h1>
+                <h1>{{ res }}</h1>
+            </div>
+            <!-- Select All records -->
+            <!--<input type='button' @click='allRecords()' value='Select All users' class="button is-success is-rounded">-->
+            <!--<br><br>-->
+
+            <!-- Add new user -->
+            <input type='button' @click='addUser()' value='Add new user' class="button is-success is-rounded">
+            <br><br>
+
+            <!-- Select record by ID -->
+            <div class="is-pulled-right is-clearfix">
+                <input type='text' v-model='userid' placeholder="Enter Userid between 1 - 24">
+                <input type='button' @click='recordByID()' value='Select user by ID' class="button is-success is-rounded">
+            </div>
+
+            <br><br>
+            <!-- List records -->
+            <table border='1' width='80%' style='border-collapse: collapse;
+                   width: 500px;margin-left: 200px' class="table is-responsive is-bordered">
+                <tr>
+                    <th>UserId</th>
+                    <th>Username</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Delete</th>
+                </tr>
+
+                <tr v-for='user in users'>
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.name }}</td>
+                    <td>{{ user.email }}</td>
+                    <td><h2 style="cursor: pointer;"><b @click='deleteRecord(user.id)'>X</b></h2></td>
+                </tr>
+            </table>
+
+        </div>
+
+        <script type = "text/javascript">
+var vue_det = new Vue({
+    el: '#intro',
+    data: {
+        message: 'VueJS CRUD Application'
+    }
+});
+//ajax fetching data with mysql sample    
+window.Vue.use(VuejsDialog.default);
+var app = new Vue({
+    el: '#myapp',
+    mounted: function () {
+        this.allRecords() //method1 allRecords execute at pageload
+    },
+    data: {
+        users: "",
+        userid: 1,
+        stmessage : '',
+        res: '',
+        action: "fetch"
+    },
+    methods: {
+        allRecords: function () {
+            axios.get('fetchUsers.php', {
+                params: {
+                    action: "fetch"
                 }
-              },
-              addUser: function(){
-                  location.href = 'addUser.html';
-              }
+            })
+                    .then(function (response) {
+                        app.users = response.data;
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+        },
+        recordByID: function () {
+            if (this.userid > 0) {
+                axios.get('fetchUsers.php', {
+                    params: {
+                        userid: this.userid,
+                        action: "fetch"
+                    }
+                })
+                        .then(function (response) {
+                            app.users = response.data;
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
             }
-        });
-      </script>      
-   </body>
+        },
+        deleteRecord: function (value) {
+            this.$dialog.confirm('Are you sure to delete ?', {
+                loader: true,
+                okText: 'Yes',
+                cancelText: 'No'
+            })
+                    .then(function (dialog) {
+                        console.log('confirm');
+                        dialog.close();
+                        axios.get('fetchUsers.php', {
+                            params: {
+                                userid: value,
+                                action: "deleteUser"
+                            }
+                        })
+                                .then(function (response) {
+                                    this.stmessage = true;
+                                    this.res = response;
+                                    //Hide the status message after 3 seconds
+                                    setTimeout(function () {
+                                        this.stmessage = false;
+                                    }, 3000);
+                                    location.reload();
+                                })
+                                .catch(function (error) {
+                                    console.log(error);
+                                });
+                    }).catch(function (error) {
+                console.debug(error.toString()); // Detailed error message
+            });
+        },
+        addUser: function () {
+            location.href = 'addUser.html';
+        }
+    }
+});
+        </script>      
+    </body>
 </html>

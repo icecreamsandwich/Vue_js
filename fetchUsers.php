@@ -1,54 +1,58 @@
 <?php
-if(isset($_GET['action'])){
-    $action = $_GET['action'];
-} 
 
+if (isset($_GET['action'])) {
+    $action = $_GET['action'];
+}
+
+/**
+ * Switch functions
+ */
 switch ($action) {
     case 'fetch':
-        if(isset($_GET['userid'])){
-            $condition = " id=".$_GET['userid'];
-        }
-        else $condition = "1";
+        if (isset($_GET['userid'])) {
+            $condition = " id=" . $_GET['userid'];
+        } else
+            $condition = "1";
         fetchUser($condition);
         break;
-    case 'adduser':addUser();        
+    case 'adduser':addUser();
+        break;
+    case 'deleteUser':deleteUser();
         break;
 
     default:
         break;
 }
 
-function fetchUser($condition){
+/**
+ * function to fecth a specific user details
+ */
+function fetchUser($condition) {
     include "config.php";
-    $userData = mysqli_query($con,"select * from users WHERE ".$condition);
+    $userData = mysqli_query($con, "select * from users WHERE " . $condition);
     $response = array();
-    while($row = mysqli_fetch_assoc($userData)){
-       $response[] = $row;
+    while ($row = mysqli_fetch_assoc($userData)) {
+        $response[] = $row;
     }
     echo json_encode($response);
     exit;
 }
 
-function addUser(){
+/**
+ * function to add a new user
+ */
+function deleteUser() {
     include "config.php";
-    if(isset($_GET['username']) && isset($_GET['name']) && isset($_GET['email'])){
-            $username = $_GET['username'];
-            $email = $_GET['email'];
-            $name = $_GET['name'];
-            try {
-                 $userData = mysqli_query($con,"Insert INTO users (username,name,email)"
-                         . "values('$username','$name','$email') ");
-            $res =  "User added successfully";
+    if (isset($_GET['userid'])) {
+        $userid = $_GET['userid'];
+        try {
+            $userData = mysqli_query($con, "DELETE FROM users WHERE id=$userid");
+            $res = "User deleted successfully";
             echo json_encode($res);
             exit;
-            } catch (Exception $exc) {
-                die("Connection failed: " . mysqli_connect_error());
-                echo $exc->getTraceAsString();
-            }         
+        } catch (Exception $exc) {
+            die("Connection failed: " . mysqli_connect_error());
+            echo $exc->getTraceAsString();
         }
-        else{
-            $res =  "Please fill all values";
-            echo json_encode($res);
-            exit;
-        }
+    }
 }
